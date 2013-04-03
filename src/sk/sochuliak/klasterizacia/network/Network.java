@@ -99,7 +99,7 @@ public class Network {
 	}
 	
 
-	private void updateClasterRatios() {
+	public void updateClasterRatios() {
 		this.nodesClusterRatios.clear();
 		for (int i = 0; i < this.nodesIds.size(); i++) {
 			long nodeId = this.nodesIds.get(i);
@@ -212,5 +212,9 @@ public class Network {
 
 	public List<long[]> getEdges() {
 		return edges;
+	}
+
+	public Map<Long, Double> getNodesClusterRatios() {
+		return nodesClusterRatios;
 	}
 }

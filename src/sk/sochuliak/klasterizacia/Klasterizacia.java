@@ -19,7 +19,7 @@ public class Klasterizacia {
 	public static final int NODES = 20;
 	public static final int EDGES = 2;
 	
-	private Map<Integer, Double> averagedClusterDistribution;
+	private Map<Double, Double> averagedClusterDistribution;
 	
 	public static void main(String... args) {
 		Klasterizacia clustering = new Klasterizacia(Klasterizacia.ITERATIONS,
@@ -28,30 +28,31 @@ public class Klasterizacia {
 	}
 	
 	public Klasterizacia(int iterations, int nodes, int edges) {
-		Map<Integer, Map<Integer, Double>> clusterDistributions = new HashMap<Integer, Map<Integer, Double>>();
+		Map<Integer, Map<Double, Double>> clusterDistributions = new HashMap<Integer, Map<Double, Double>>();
 		
 		for (int i = 0; i < iterations; i++) {
 			Network network = Network.buildNetwork(edges, nodes);
 			NetworkAnalyse na = new NetworkAnalyse(network);
-			clusterDistributions.put(i, na.getFullStandardizedClusterDistribution());
-			System.out.println(na.getFullStandardizedClusterDistribution());
+			clusterDistributions.put(i, na.getStandardizedClusterDistribution());
+			System.out.println(na.getStandardizedClusterDistribution());
 		}
 		this.averagedClusterDistribution = NetworkUtils.getAveragedClusterDistribution(clusterDistributions);
 		System.out.println(this.averagedClusterDistribution);
 	}
 	
 	private void showClusterDistributionGraph() {
-		Set<Integer> degrees = this.averagedClusterDistribution.keySet();
-		List<Integer> degreesList = new ArrayList<Integer>(degrees);
+		Set<Double> degrees = this.averagedClusterDistribution.keySet();
+		List<Double> degreesList = new ArrayList<Double>(degrees);
 		Collections.sort(degreesList);
 		
 		List<double[]> points = new ArrayList<double[]>();
 		for (int i = 0; i < degreesList.size(); i++) {
 			double x = (double) degreesList.get(i);
 			double y = this.averagedClusterDistribution.get(degreesList.get(i));
-			double logx = (x == 0) ? 0 : Math.log(x);
-			double logy = (y == 0) ? 0 : Math.log(y);
-			points.add(new double[]{logx, logy});
+//			double logx = (x == 0) ? 0 : Math.log(x);
+//			double logy = (y == 0) ? 0 : Math.log(y);
+//			points.add(new double[]{logx, logy});
+			points.add(new double[]{x, y});
 		}
 		
 		Map<String, List<double[]>> data = new HashMap<String, List<double[]>>();
