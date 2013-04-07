@@ -13,32 +13,41 @@ public class NetworkAnalyse {
 		this.network = network;
 	}
 	
-	public Map<Double, List<Long>> getClusterDistribution() {
-		Map<Double, List<Long>> result = new HashMap<Double, List<Long>>();
+	public Map<Integer, List<Long>> getDegreeDistribution() {
+		Map<Integer, List<Long>> result = new HashMap<Integer, List<Long>>();
+		
+		List<Long> nodes = this.network.getNodesIds();
+		
+		for (Long nodeId : nodes) {
+			int adjacentNodeCount = this.network.getAdjacentNodesCount(nodeId);
+			if (result.get(adjacentNodeCount) == null) {
+				result.put(adjacentNodeCount, new ArrayList<Long>());
+			}
+			result.get(adjacentNodeCount).add(nodeId);
+		}
+		
+		return result;
+	}
+	
+	public Map<Integer, Double> getStandardizedClusterDistribution() {
+		Map<Integer, Double> result = new HashMap<Integer, Double>();
 		
 		this.network.updateClasterRatios();
 		Map<Long, Double> clustersRatios = this.network.getNodesClusterRatios();
 		
-		List<Long> nodesIds = this.network.getNodesIds();
+		Map<Integer, List<Long>> degreeDistribution = this.getDegreeDistribution();
 		
-		for (Long nodeId : nodesIds) {
-			Double nodeClusterRatio = clustersRatios.get(nodeId);
-			if (result.get(nodeClusterRatio) == null) {
-				result.put(nodeClusterRatio, new ArrayList<Long>());
+		for (Integer degree : degreeDistribution.keySet()) {
+			List<Long> nodes = degreeDistribution.get(degree);
+			
+			double clusterSum = 0d;
+			for (Long node : nodes) {
+				clusterSum += clustersRatios.get(node);
 			}
-			result.get(nodeClusterRatio).add(nodeId);
-		}
-		return result;
-	}
-	
-	public Map<Double, Double> getStandardizedClusterDistribution() {
-		Map<Double, List<Long>> clusterDistribution = this.getClusterDistribution();
-		
-		double nodesCount = (double) this.network.getNodesIds().size();
-		
-		Map<Double, Double> result = new HashMap<Double, Double>();
-		for (Double key : clusterDistribution.keySet()) {
-			result.put(key, (double) clusterDistribution.get(key).size() / nodesCount);
+			double averageCluster = clusterSum / (double) nodes.size();
+			if (averageCluster != 0d) {
+				result.put(degree, clusterSum / (double) nodes.size());				
+			}
 		}
 		return result;
 	}
